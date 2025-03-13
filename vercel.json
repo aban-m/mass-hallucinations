@@ -1,6 +1,8 @@
 {
 	"cleanUrls": true,
 	"buildCommand": "next build",
-	"installCommand": "npm install",
-	"devCommand": "next dev --turbopack"
+	"installCommand": "pnpm install",
+	"devCommand": "next dev --turbopack",
+	"outputDirectory": ".next",
+	"framework": "nextjs"
 }
