@@ -2,7 +2,7 @@ import { initTRPC, TRPCError } from "@trpc/server";
 import { getServerSession, Session } from "next-auth"
 
 interface Context {
-    authSession: Session
+    authSession: Session | null | undefined
 }
 
 const t = initTRPC.context<Context>().create()
