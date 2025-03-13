@@ -1,9 +1,17 @@
 import { router, publicProcedure, protectedProcedure } from "./trpc"
 
+let x = 1
+
 export const appRouter = router({
-    ping: protectedProcedure
+    ping: publicProcedure
         .query(() => { 
-            return "pong"
+            x += 1
+            return `Pong ${x}`
+        }),
+    reset: protectedProcedure
+        .mutation(() => {
+            x = 1
+            return `Reset ${x}`
         })
 })
 
