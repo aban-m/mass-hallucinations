@@ -16,7 +16,6 @@ async function seed() {
             name: "Demo User",
             isAdmin: true,
             credit: 100,
-            canAccess: { ids: [] }
         }).returning({id: creation.id})
 
         const user2 = await db.insert(user).values({
@@ -25,7 +24,6 @@ async function seed() {
             name: "Alice Johnson",
             isAdmin: false,
             credit: 50,
-            canAccess: { ids: [] }
         }).returning({id: creation.id})
 
 

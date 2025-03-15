@@ -1,10 +1,20 @@
-import { user as userTable , creation as creationTable } from "@/lib/db/schema";
+import { user as userTable , creation as creationTable, userAccess as userAccessTable } from "@/lib/db/schema";
+import { db } from ".";
 
-export function canAccess(
+export async function canAccess(
     user: typeof userTable.$inferSelect,
     creation: typeof creationTable.$inferSelect
 ){
-    // TODO: Better implementation of canAccess
-    // TODO: Resolve "canAccess" type hack
-    return creation.isPublic || user.isAdmin || creation.userId === user.id || user.canAccess!.ids.includes(creation.id)
+    if (creation.isPublic || user.isAdmin || creation.userId === user.id) {
+        return true;
+    }
+    // query the table
+    const hasAccess = !!(await db.query.userAccess.findFirst({
+        where: (ua, { eq, and }) => and(
+            eq(ua.userId, user.id),
+            eq(ua.creationId, creation.id)
+        )
+    }))
+
+    return hasAccess;
 }
