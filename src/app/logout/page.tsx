@@ -3,13 +3,13 @@
 import { signOut, useSession } from "next-auth/react";
 
 export default function LogoutPage() {
-    const { data: session } = useSession();
+    const session = useSession();
 
-    if (session?.user) {
+    if (session?.data?.user) {
         return (
             <div>
-                <pre>{session.user?.id}</pre>
-                <h1>Welcome, {session.user?.email}</h1>
+                <pre>{session?.data.user?.id}</pre>
+                <h1>Welcome, {session?.data.user?.email}</h1>
                 <button onClick={() => signOut()}>Logout</button>
             </div>
         );
