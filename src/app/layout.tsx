@@ -17,12 +17,18 @@ export default async function RootLayout({
   const session = await getServerSession();
 
   return (
-    <html lang="en">
+    <html lang="en" data-wgscriptallow="true">
       <body>
         <nav>
           <Link href="/login">Login</Link>
           <Link href="/logout">Logout</Link>
           <Link href="/">Homepage</Link>
+          <Link href="/admin/users">Users</Link>
+          <Link href="/studio">Studio</Link>
+          <Link href="/gallery">Gallery</Link>
+          <Link href="/api/auth/session">Session</Link>
+          <Link href="/gallery">Gallery</Link>
+          <Link href="/gallery/mine">My gallery</Link>
           <br />
           <h1>Welcome to Mass Hall!</h1>
           <hr />
