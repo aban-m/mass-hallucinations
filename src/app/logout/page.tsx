@@ -5,10 +5,11 @@ import { signOut, useSession } from "next-auth/react";
 export default function LogoutPage() {
     const { data: session } = useSession();
 
-    if (session) {
+    if (session?.user) {
         return (
             <div>
-                <h1>Welcome, {session.user?.name}</h1>
+                <pre>{session.user?.id}</pre>
+                <h1>Welcome, {session.user?.email}</h1>
                 <button onClick={() => signOut()}>Logout</button>
             </div>
         );

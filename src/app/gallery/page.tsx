@@ -1,3 +1,4 @@
+"use client";
 import { trpc } from "@/client/trpc"
 
 export default function PublicGalleryPage() {
@@ -7,8 +8,8 @@ export default function PublicGalleryPage() {
             <h1>Public Gallery</h1>
             {pubGal.data?.map((creation) => (
                 <div key={creation.id}>
-                    <h2>{creation.title}</h2>
-                    <p>{creation.description}</p>
+                    <h2>{creation.id}</h2>
+                    <p>{creation.prompt}</p>
                 </div>
             ))}
         </main>
