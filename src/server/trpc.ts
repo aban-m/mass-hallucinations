@@ -3,10 +3,11 @@ import { user as userTable } from "@/lib/db/schema";
 import { initTRPC, TRPCError } from "@trpc/server";
 import { getServerSession, Session } from "next-auth"
 import { eq } from "drizzle-orm"
-import { transmittedUser } from "../../next-auth";
+import { TransmittedUser } from "../../next-auth";
+import authOptions from "@/lib/auth/auth-options";
 
 interface Context {
-    user: transmittedUser
+    user: TransmittedUser
 }
 
 const t = initTRPC.context<Context>().create()
@@ -22,7 +23,7 @@ export const publicProcedure = baseProcedure
 // Populates the context with session, but does not complain
 // if the session is empty.
 export const authedProcedure = baseProcedure.use(async (opts) => {
-    const session = await getServerSession()
+    const session = await getServerSession(authOptions)
     if (!session) {
         return opts.next()
     }

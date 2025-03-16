@@ -15,7 +15,7 @@ import { eq, or, and } from "drizzle-orm";
 import { z } from "zod";
 import { fetchImage } from "@/lib/storage";
 import { randomUUID } from "crypto";
-import { getUserByEmail } from "@/lib/db/queries";
+import { getUser } from "@/lib/db/queries";
 
 const getPrivateGalleryDto = z.object({
   ownerId: z.string().uuid(),
@@ -45,7 +45,7 @@ export const appRouter = router({
   resolveUUID: publicProcedure
     .input(z.string().email())
     .query(async ({ input: email }) => {
-      const userRecord = await getUserByEmail(email)
+      const userRecord = await getUser(email)
       return userRecord ? {'uuid': userRecord.id} : {'uuid': null}
     }),
 
@@ -73,7 +73,8 @@ export const appRouter = router({
   generateImage: protectedProcedure
     .input(generateImageDto)
     .mutation(async ({ input: { prompt, seed, extraArgs }, ctx: { user } }) => {
-      if (user!.credit < 10) {
+      const credit = (await getUser(user.email)).credit!
+      if (credit < 10) {
         throw new Error("Not enough credit");
       }
       await db.insert(creationTable).values({
@@ -87,7 +88,7 @@ export const appRouter = router({
 
       await db
         .update(userTable)
-        .set({ credit: user.credit - 10 })
+        .set({ credit: credit - 10 })
         .where(eq(userTable.id, user!.id));
       return fetchImage(null, prompt);
     }),

@@ -5,6 +5,7 @@ import {
 } from "@/lib/db/schema";
 import { db } from ".";
 import { eq } from "drizzle-orm";
+import { TransmittedUser } from "../../../next-auth";
 
 export async function canAccess(
   user: typeof userTable.$inferSelect,
@@ -22,9 +23,7 @@ export async function canAccess(
   return hasAccess;
 }
 
-export async function getUserByEmail(
-  email: string
-): Promise<typeof userTable.$inferSelect | undefined> {
+export async function getUser(email: string) {
     const userRecord = (await db.select().from(userTable).where(eq(userTable.email, email)))[0]
     return userRecord
 }
