@@ -3,7 +3,7 @@ import { TRPCProvider } from "@/client";
 import SessionProvider from "@/client/session";
 import Link from "next/link";
 import { getServerSession } from "next-auth";
-
+import authOptions from "@/lib/auth/auth-options"
 export const metadata: Metadata = {
   title: "Mass Hallucinations",
   description: "Create and share AI art",
@@ -14,7 +14,7 @@ export default async function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const session = await getServerSession();
+  const session = await getServerSession(authOptions);
 
   return (
     <html lang="en" data-wgscriptallow="true">
