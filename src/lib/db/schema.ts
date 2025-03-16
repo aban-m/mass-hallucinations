@@ -12,8 +12,8 @@ import {
 import { z } from "zod";
 
 export const creationExtraArgs = z.object({
-  width: z.number().int().positive().min(150).max(2000).nullable(),
-  height: z.number().int().positive().min(150).max(2000).nullable(),
+  width: z.number().int().positive().min(150).max(2000),
+  height: z.number().int().positive().min(150).max(2000),
 });
 
 export type CreationExtraArgs = z.infer<typeof creationExtraArgs>;
@@ -41,10 +41,7 @@ export const creation = pgTable(
     description: varchar("description", { length: 500 }).notNull(),
     prompt: varchar("prompt", { length: 2048 }).notNull(),
     seed: integer("seed").notNull(),
-    extraArgs: jsonb("extra_args").$type<CreationExtraArgs>().default({
-      width: null,
-      height: null,
-    }),
+    extraArgs: jsonb("extra_args").$type<CreationExtraArgs>(),
     createdAt: timestamp("created_at", { withTimezone: true, mode: "date" })
       .notNull()
       .defaultNow(),

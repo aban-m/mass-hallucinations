@@ -1,0 +1,1 @@
+ALTER TABLE "creation" ALTER COLUMN "extra_args" DROP DEFAULT;
