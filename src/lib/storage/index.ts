@@ -2,10 +2,10 @@ import { creation } from "@/lib/db/schema";
 import { db  } from "@/lib/db";
 import { eq } from "drizzle-orm";
 
-export async function retrieveImage(creationId: string, prompt: string | null): Promise<string>;
-export async function retrieveImage(creationId: string | null, prompt: string): Promise<string>;
+export async function fetchImage(creationId: string, prompt: string | null): Promise<string>;
+export async function fetchImage(creationId: string | null, prompt: string): Promise<string>;
 
-export async function retrieveImage(creationId: string | null, prompt: string | null) {
+export async function fetchImage(creationId: string | null, prompt: string | null) {
     // first, retrieve the prompt
     let actualPrompt = prompt;
     if (!actualPrompt) {
