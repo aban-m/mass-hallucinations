@@ -1,18 +1,23 @@
 "use client";
 import { trpc } from "@/client/trpc";
 import CreationGroup from "@/components/CreationGroup";
-import CreationView from "@/components/CreationView";
+import { GalleryDto } from "@/server";
+import { useState } from "react";
 
-export default function PublicGalleryPage() {
-  const pubGal = trpc.publicGallery.useQuery();
+export default function GalleryPage() {
+  const [params, setParams] = useState<GalleryDto>({public: true, mine: false, fromUsers: []})
+
+  const gallery = trpc.gallery.useQuery(params)
+  if (!gallery.data) {
+    return <p>Loading...</p>
+  }
+
   return (
     <main>
-      <h1>Public Gallery</h1>
-      {pubGal.data ? (
-        <CreationGroup creations={pubGal.data!} />
-      ) : (
-        <p>NO DATA</p>
-      )}
+      <h1>Gallery</h1>
+      <div>
+        <CreationGroup creations={gallery.data!} />
+      </div>
     </main>
   );
 }

@@ -25,6 +25,8 @@ const galleryDto = z.object({
   mine: z.boolean(),
 });
 
+export type GalleryDto = z.infer<typeof galleryDto>
+
 const generateImageDto = createInsertSchema(creationTable, {
   seed: (schema) => schema.default(1),
 }).omit({ createdAt: true, userId: true, id: true });
