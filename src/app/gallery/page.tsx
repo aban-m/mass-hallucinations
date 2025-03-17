@@ -15,6 +15,7 @@ export default function GalleryPage() {
   return (
     <main>
       <h1>Gallery</h1>
+      
       <div>
         <CreationGroup creations={gallery.data!} />
       </div>
