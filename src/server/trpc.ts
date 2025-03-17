@@ -1,23 +1,18 @@
-import { db } from "@/lib/db";
-import { user as userTable } from "@/lib/db/schema";
+
 import { initTRPC, TRPCError } from "@trpc/server";
 import { getServerSession, Session } from "next-auth"
-import { eq } from "drizzle-orm"
 import { TransmittedUser } from "../../next-auth";
 import authOptions from "@/lib/auth/auth-options";
 
-interface Context {
+interface ServerContext {
     user: TransmittedUser
 }
 
-const t = initTRPC.context<Context>().create()
+const t = initTRPC.context<ServerContext>().create()
 
 export const router = t.router
-
 export const baseProcedure = t.procedure
-
 export const publicProcedure = baseProcedure
-
 
 // authedProcedure:
 // Populates the context with session, but does not complain

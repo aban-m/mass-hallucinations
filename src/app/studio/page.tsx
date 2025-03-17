@@ -12,21 +12,34 @@ export default function StudioPage() {
     isPublic: false,
   });
   const [result, setResult] = useState<string>("");
-  const generateImage = trpc.generateImage.useMutation({
+  const commitImage = trpc.commitImage.useMutation({
     async onSuccess(data, variables, context) {
       setResult(data);
     },
   });
+  const generateImage = trpc.generateImage.useMutation({
+    async onSuccess(data, variables, context) {
+      setResult(data)
+    },
+  })
 
   const handleSubmit = async (ev: React.FormEvent<HTMLFormElement>) => {
     ev.preventDefault();
     if (formData.prompt) {
-      generateImage.mutate({
+      commitImage.mutate({
         ...formData,
         extraArgs: { width: 512, height: 512 },
       });
     }
   };
+
+  const handlePreview = async () => {
+    if (formData.prompt) {
+      generateImage.mutate({
+        ...formData
+      })
+    }
+  }
 
   return (
     <main style={{ padding: "1rem", fontFamily: "sans-serif" }}>
@@ -106,9 +119,10 @@ export default function StudioPage() {
             marginTop: "1rem",
           }}
         >
-          Generate!
+          Submit!
         </button>
       </form>
+      <button onClick={handlePreview}>Preview</button>
 
       {result && (
         <div style={{ textAlign: "center", marginTop: "1rem" }}>

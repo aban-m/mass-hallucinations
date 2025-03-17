@@ -5,7 +5,10 @@ import {
 } from "@/lib/db/schema";
 import { db } from ".";
 import { eq } from "drizzle-orm";
-import { TransmittedUser } from "../../../next-auth";
+import { serverPolicy } from "../common/config";
+import * as dtos from "@/lib/common/dtos";
+import { randomUUID } from "crypto";
+import { InsufficientCreditError } from "../common/errors";
 
 export async function canAccess(
   user: typeof userTable.$inferSelect,
@@ -23,7 +26,44 @@ export async function canAccess(
   return hasAccess;
 }
 
-export async function getUser(email: string) {
-    const userRecord = (await db.select().from(userTable).where(eq(userTable.email, email)))[0]
-    return userRecord
+export async function getUserByEmail(email: string) {
+  const userRecord = (
+    await db.select().from(userTable).where(eq(userTable.email, email))
+  )[0];
+  return userRecord;
 }
+
+export async function getUserByUUID(uuid: string) {
+  const userRecord = (
+    await db.select().from(userTable).where(eq(userTable.id, uuid))
+  )[0];
+  return userRecord;
+}
+
+export async function commitImage(userId: string, dto: dtos.CommitImageDto) {
+  const user = await getUserByUUID(userId);
+  if (user.credit < serverPolicy.IMAGE_COST) {
+    throw new InsufficientCreditError()
+  }
+  const out = await db.transaction(async (tx) => {
+    const result = await tx
+      .insert(creationTable)
+      .values({
+        ...dto,
+        userId,
+        id: randomUUID(),
+      })
+      .returning();
+    
+      const updatedRecords = await tx
+       .update(userTable)
+       .set({credit: user.credit - serverPolicy.IMAGE_COST})
+       .where(eq(userTable.id, userId))
+       .returning({ credit: userTable.credit })
+      
+      return updatedRecords[0].credit
+  });
+
+  return out
+}
+

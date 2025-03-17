@@ -1,9 +1,6 @@
-import { JWT, NextAuthOptions, Session } from "next-auth";
+import { NextAuthOptions } from "next-auth";
 import GoogleProvider from "next-auth/providers/google";
-import  CredentialsProvider from "next-auth/providers/credentials";
-import { getUser } from "../db/queries";
-import { AuthError } from "../common";
-import { TransmittedUser } from "../../../next-auth";
+import { getUserByEmail } from "../db/queries";
 
 const authOptions: NextAuthOptions = {
   providers: [
@@ -29,7 +26,7 @@ const authOptions: NextAuthOptions = {
     async session({ session, token }) {
       console.log('\t\tSESSION CALLBACK')
       if (token.email && !session.user.id) {
-      session.user = await getUser(token.email)
+      session.user = await getUserByEmail(token.email)
       console.log('\t\t\tDB TRIP!')
       }
       return session
