@@ -3,7 +3,7 @@ import { TRPCProvider } from "@/client";
 import SessionProvider from "@/client/session";
 import Link from "next/link";
 import { getServerSession } from "next-auth";
-import authOptions from "@/lib/auth/auth-options"
+import authOptions from "@/lib/auth/auth-options";
 export const metadata: Metadata = {
   title: "Mass Hallucinations",
   description: "Create and share AI art",
@@ -20,9 +20,15 @@ export default async function RootLayout({
     <html lang="en" data-wgscriptallow="true">
       <body>
         <nav>
-        <Link href="/">Homepage</Link>
-          {session?.user ? <Link href="/logout">Logout</Link> : <Link href="/login">Login</Link>}
-          <Link href="/studio">Studio</Link>
+          <Link href="/">Homepage</Link>
+          {session?.user ? (
+            <>
+              <Link href="/logout">Logout</Link>
+              <Link href="/studio">Studio</Link>
+            </>
+          ) : (
+            <Link href="/login">Login</Link>
+          )}
           <Link href="/gallery">Gallery</Link>
           <br />
           <h1>Welcome to Mass Hall!</h1>
