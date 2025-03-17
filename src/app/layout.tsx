@@ -20,17 +20,13 @@ export default async function RootLayout({
     <html lang="en" data-wgscriptallow="true">
       <body>
         <nav>
-          <Link href="/login">Login</Link>
-          <Link href="/logout">Logout</Link>
-          <Link href="/">Homepage</Link>
-          <Link href="/admin/users">Users</Link>
+        <Link href="/">Homepage</Link>
+          {session?.user ? <Link href="/logout">Logout</Link> : <Link href="/login">Login</Link>}
           <Link href="/studio">Studio</Link>
           <Link href="/gallery">Gallery</Link>
-          <Link href="/api/auth/session">Session</Link>
-          <Link href="/gallery">Gallery</Link>
-          <Link href="/gallery/mine">My gallery</Link>
           <br />
           <h1>Welcome to Mass Hall!</h1>
+          {session?.user && <pre>Your ID: {session?.user.id}</pre>}
           <hr />
         </nav>
         <TRPCProvider>
