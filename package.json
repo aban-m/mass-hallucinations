@@ -16,6 +16,7 @@
     "@trpc/react-query": "^10.45.2",
     "@trpc/server": "^10.45.2",
     "drizzle-orm": "^0.40.0",
+    "drizzle-zod": "^0.7.0",
     "nanoid": "^5.1.2",
     "next": "15.2.0",
     "next-auth": "^4.24.11",
@@ -25,17 +26,16 @@
     "zod": "^3.24.2"
   },
   "devDependencies": {
-    "drizzle-kit": "^0.30.5",
-    "dotenv": "^16.4.7",
     "@eslint/eslintrc": "^3",
     "@tailwindcss/postcss": "^4",
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",
+    "dotenv": "^16.4.7",
+    "drizzle-kit": "^0.30.5",
     "eslint": "^9",
     "eslint-config-next": "15.2.0",
     "tailwindcss": "^4",
     "typescript": "^5"
   }
-
 }

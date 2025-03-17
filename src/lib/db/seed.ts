@@ -10,7 +10,7 @@ const randomBool = () => Math.random() > 0.5;
 const randomInt = (min: number, max: number) => 
     Math.floor(Math.random() * (max - min + 1)) + min;
 
-async function seed() {
+async function seedDatabase() {
     try {
         console.log("Clearing database...");
         await db.delete(userAccess); // Clear user access first (to prevent FK issues)
@@ -94,7 +94,7 @@ async function seed() {
     }
 }
 
-seed().catch((error) => {
+seedDatabase().catch((error) => {
     console.error(error);
     process.exit(1);
 });

@@ -42,7 +42,7 @@ export const creation = pgTable(
     prompt: varchar("prompt", { length: 2048 }).notNull(),
     seed: integer("seed").notNull(),
     extraArgs: jsonb("extra_args").$type<CreationExtraArgs>(),
-    createdAt: timestamp("created_at", { withTimezone: true, mode: "date" })
+    createdAt: timestamp("created_at", { withTimezone: true, mode: "string" })
       .notNull()
       .defaultNow(),
   },

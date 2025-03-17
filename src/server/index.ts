@@ -17,20 +17,11 @@ import { fetchImage } from "@/lib/storage";
 import { randomUUID } from "crypto";
 import { getUser } from "@/lib/db/queries";
 
-const getPrivateGalleryDto = z.object({
-  ownerId: z.string().uuid(),
-});
-// infer type from the schema
-export type GetPrivateGalleryDto = z.infer<typeof getPrivateGalleryDto>;
+import { createInsertSchema } from 'drizzle-zod';
 
-const generateImageDto = z.object({
-  prompt: z.string().min(5).max(4096),
-  seed: z.number().int().nullable().default(1),
-  extraArgs: creationExtraArgs.default({
-    width: 360,
-    height: 540,
-  }),
-});
+const generateImageDto = createInsertSchema(creationTable, {
+  seed: (schema) => schema.default(1)
+}).omit({createdAt: true, userId: true, id: true})
 
 export type GenerateImageDto = z.infer<typeof generateImageDto>;
 
@@ -50,8 +41,8 @@ export const appRouter = router({
     }),
 
   privateGallery: authedProcedure
-    .input(getPrivateGalleryDto)
-    .query(async ({ input: { ownerId }, ctx }) => {
+    .input(z.string().uuid())
+    .query(async ({ input: ownerId, ctx }) => {
       const visitor = ctx.user;
       console.log(visitor.id);
       let result = await db
@@ -72,25 +63,23 @@ export const appRouter = router({
 
   generateImage: protectedProcedure
     .input(generateImageDto)
-    .mutation(async ({ input: { prompt, seed, extraArgs }, ctx: { user } }) => {
+    .mutation(async ({ input , ctx: { user } }) => {
       const credit = (await getUser(user.email)).credit!
       if (credit < 10) {
         throw new Error("Not enough credit");
       }
-      await db.insert(creationTable).values({
-        id: randomUUID().toString(),
-        userId: user!.id,
-        prompt: prompt,
-        description: "",
-        title: "",
-        seed: seed ?? 0,
-      });
+
+      await db.insert(creationTable).values({...input,
+        userId: user.id,
+        id: randomUUID()
+      })
 
       await db
         .update(userTable)
         .set({ credit: credit - 10 })
         .where(eq(userTable.id, user!.id));
-      return fetchImage(null, prompt);
+
+      return fetchImage(null, input.prompt);
     }),
 
   listUsers: adminProcedure.query(async () => {
