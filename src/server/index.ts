@@ -17,15 +17,37 @@ import { fetchImage } from "@/lib/storage";
 import { randomUUID } from "crypto";
 import { getUser } from "@/lib/db/queries";
 
-import { createInsertSchema } from 'drizzle-zod';
+import { createInsertSchema } from "drizzle-zod";
+
+const galleryDto = z.object({
+  public: z.boolean(),
+  fromUsers: z.array(z.string().uuid()).optional().default([]),
+  mine: z.boolean(),
+});
 
 const generateImageDto = createInsertSchema(creationTable, {
-  seed: (schema) => schema.default(1)
-}).omit({createdAt: true, userId: true, id: true})
+  seed: (schema) => schema.default(1),
+}).omit({ createdAt: true, userId: true, id: true });
 
 export type GenerateImageDto = z.infer<typeof generateImageDto>;
 
 export const appRouter = router({
+  gallery: authedProcedure.input(galleryDto).query(async ({input, ctx: {user}}) => {
+    let fromUsers = input.fromUsers.concat((input.mine && user) ? user.id : [])
+    return db
+      .select()
+      .from(creationTable)
+      .where(
+        input.public ? (
+          eq(creationTable.isPublic, true)
+        ) : (
+          and(
+            or(...fromUsers.map((uuid) => eq(creationTable.userId, uuid)))
+          )
+        )
+      )
+  }),
+
   publicGallery: publicProcedure.query(async () => {
     return db
       .select()
@@ -36,8 +58,8 @@ export const appRouter = router({
   resolveUUID: publicProcedure
     .input(z.string().email())
     .query(async ({ input: email }) => {
-      const userRecord = await getUser(email)
-      return userRecord ? {'uuid': userRecord.id} : {'uuid': null}
+      const userRecord = await getUser(email);
+      return userRecord ? { uuid: userRecord.id } : { uuid: null };
     }),
 
   privateGallery: authedProcedure
@@ -63,16 +85,15 @@ export const appRouter = router({
 
   generateImage: protectedProcedure
     .input(generateImageDto)
-    .mutation(async ({ input , ctx: { user } }) => {
-      const credit = (await getUser(user.email)).credit!
+    .mutation(async ({ input, ctx: { user } }) => {
+      const credit = (await getUser(user.email)).credit!;
       if (credit < 10) {
         throw new Error("Not enough credit");
       }
 
-      await db.insert(creationTable).values({...input,
-        userId: user.id,
-        id: randomUUID()
-      })
+      await db
+        .insert(creationTable)
+        .values({ ...input, userId: user.id, id: randomUUID() });
 
       await db
         .update(userTable)
