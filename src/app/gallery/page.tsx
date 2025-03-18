@@ -1,7 +1,7 @@
 "use client";
 import { trpc } from "@/client/trpc";
 import CreationGroup from "@/components/CreationGroup";
-import { GalleryDto } from "@/server";
+import { GalleryDto } from "@/lib/common/dtos";
 import { useState } from "react";
 
 export default function GalleryPage() {
