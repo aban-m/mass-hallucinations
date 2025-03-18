@@ -1,10 +1,10 @@
-import { creation as creationTable } from "@/lib/db/schema";
+import { Creation } from "@/lib/db/schema";
 import CreationView from "./CreationView";
 
 export default function CreationGroup({
   creations,
 }: {
-  creations: (typeof creationTable.$inferSelect)[];
+  creations: Creation[];
 }) {
   return (
     <>

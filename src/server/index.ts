@@ -12,16 +12,25 @@ import { eq, or, and } from "drizzle-orm";
 import { z } from "zod";
 import { fetchImage } from "@/lib/storage";
 import { randomUUID } from "crypto";
-import { commitImage, getUserByEmail } from "@/lib/db/queries";
+import { canAccess, commitImage, getCreationByUUID, getUserByEmail } from "@/lib/db/queries";
 
 import * as dtos from "@/lib/common/dtos";
+import { TRPCError } from "@trpc/server";
 
 export const appRouter = router({
+  piece: protectedProcedure
+    .input(z.string().uuid())
+    .query(async ({ input: imageUUID, ctx: { user } }) => {
+      const creation = await getCreationByUUID(imageUUID)
+      if (!creation) { throw new TRPCError({code: "NOT_FOUND"})}
+      if (!canAccess(user, creation!)) { throw new TRPCError({code: "FORBIDDEN"})}
+      return creation
+    }),
   gallery: authedProcedure
     .input(dtos.galleryDto)
     .query(async ({ input, ctx: { user } }) => {
       let fromUsers = input.fromUsers.concat(input.mine && user ? user.id : []);
-      return db
+      const results = db
         .select()
         .from(creationTable)
         .where(
@@ -31,9 +40,10 @@ export const appRouter = router({
                 or(...fromUsers.map((uuid) => eq(creationTable.userId, uuid)))
               )
         );
+      return results;
     }),
 
-  resolveUUID: publicProcedure
+  resolveUser: publicProcedure
     .input(z.string().email())
     .query(async ({ input: email }) => {
       const userRecord = await getUserByEmail(email);
@@ -45,7 +55,7 @@ export const appRouter = router({
     .mutation(async ({ input, ctx: { user } }) => {
       const result = fetchImage(null, input.prompt);
       await commitImage(user.id, input);
-      return fetchImage(null, input.prompt)
+      return fetchImage(null, input.prompt);
     }),
 
   generateImage: (serverPolicy.GUESTS_CAN_GENERATE
