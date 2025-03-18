@@ -1,17 +1,24 @@
-import Image, {ImageProps} from "next/image";
-import { creation } from "@/lib/db/schema"
+import Image, { ImageProps } from "next/image";
+import { creation } from "@/lib/db/schema";
+import { forwardRef } from "react";
 
-type CreationViewProps = Omit<ImageProps & (typeof creation.$inferSelect), "src" | "alt">
+type CreationViewProps = Omit<ImageProps & (typeof creation.$inferSelect), "src" | "alt">;
 
-export default function CreationView(props: CreationViewProps) {
-    return (
-    <div><Image 
-        src={`/api/image/${props.id}`}
-        alt={props.title}
+const CreationView = forwardRef<HTMLDivElement, CreationViewProps>(({ id, title, prompt, ...props }, ref) => {
+  return (
+    <div ref={ref}>
+      <Image 
+        src={`/api/image/${id}`}
+        alt={title}
         unoptimized
-        width={360} height={480}
-    />
-    <p>{props.title}</p>
-    <i>Prompt: {props.prompt}</i>
-    </div>)
-}
+        width={480} 
+        height={360}
+        {...props}
+      />
+      <p>{title}</p>
+      <i>Prompt: {prompt}</i>
+    </div>
+  );
+});
+
+export default CreationView;
