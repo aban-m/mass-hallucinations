@@ -6,9 +6,6 @@ type TransmittedUser = Pick<fullUser, "email" | "isAdmin" | "name" | "id">      
 
 declare module "next-auth" {
   interface Session extends DefaultSession {
-    user: TransmittedUser
-  }
-  interface JWT extends DefaultJWT {
-    user: TransmittedUser
+    user: TransmittedUser | undefined
   }
 }
