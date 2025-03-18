@@ -18,16 +18,21 @@ export const creationExtraArgs = z.object({
 
 export type CreationExtraArgs = z.infer<typeof creationExtraArgs>;
 
-export const user = pgTable("user", {
-  id: uuid("id").primaryKey(),
-  email: varchar("email", { length: 256 }).notNull().unique(),
-  name: varchar("name", { length: 256 }).notNull(),
-  isAdmin: boolean("is_admin").notNull().default(false),
-  credit: integer("credit").notNull().default(50),
-  createdAt: timestamp("created_at", { withTimezone: true, mode: "date" })
-    .notNull()
-    .defaultNow(),
-});
+export const user = pgTable(
+  "user",
+  {
+    id: uuid("id").primaryKey(),
+    email: varchar("email", { length: 256 }).notNull().unique(),
+    username: varchar("username", { length: 20 }).notNull().unique(),
+    name: varchar("name", { length: 256 }).notNull(),
+    isAdmin: boolean("is_admin").notNull().default(false),
+    credit: integer("credit").notNull().default(50),
+    createdAt: timestamp("created_at", { withTimezone: true, mode: "string" })
+      .notNull()
+      .defaultNow(),
+  },
+  (table) => [index("creation_username_idx").on(table.username)]
+);
 
 export const creation = pgTable(
   "creation",
@@ -52,8 +57,8 @@ export const creation = pgTable(
   ]
 );
 
-export const votes = pgTable(
-  "votes",
+export const vote = pgTable(
+  "vote",
   {
     id: uuid("id").primaryKey(),
     creationId: uuid("creation_id")
@@ -72,19 +77,26 @@ export const votes = pgTable(
 );
 
 export const userAccess = pgTable(
-    "user_access",
-    {
-        id: uuid("id").primaryKey(),
-        userId: uuid("user_id")
-            .notNull()
-            .references(() => user.id),
-        creationId: uuid("creation_id")
-            .notNull()
-            .references(() => creation.id),
-    },
-    (table) => [
-        index("user_access_user_idx").on(table.userId),
-        index("user_access_creation_idx").on(table.creationId),
-        unique("user_access_creation_user_unique").on(table.creationId, table.userId)
-    ]
-)
+  "user_access",
+  {
+    id: uuid("id").primaryKey(),
+    userId: uuid("user_id")
+      .notNull()
+      .references(() => user.id),
+    creationId: uuid("creation_id")
+      .notNull()
+      .references(() => creation.id),
+  },
+  (table) => [
+    index("user_access_user_idx").on(table.userId),
+    index("user_access_creation_idx").on(table.creationId),
+    unique("user_access_creation_user_unique").on(
+      table.creationId,
+      table.userId
+    ),
+  ]
+);
+
+export type User = typeof user.$inferSelect
+export type Creation = typeof creation.$inferSelect
+export type Vote = typeof vote.$inferSelect

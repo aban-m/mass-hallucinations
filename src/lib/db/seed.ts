@@ -21,16 +21,18 @@ async function seedDatabase() {
 
         await db.insert(user).values([
             {
-                id: randomUUID(),
+                id: '1a737a58-84a2-4546-89e4-51f057bd9345',
                 email: 'aban.salah.mahmoud@gmail.com',
                 name: 'Aban',
                 isAdmin: true,
+                username: 'aban',
                 credit: 1000
             },
             {
                 id: randomUUID(),
                 email: 'abandeveloper@gmail.com',
                 name: 'Aban2',
+                username:'aban2',
                 isAdmin: false,
                 credit: 10000
             }
@@ -42,6 +44,7 @@ async function seedDatabase() {
                 id: randomUUID(),
                 email: `user${i}@example.com`,
                 name: `User ${i}`,
+                username: `user-${i}`,
                 isAdmin: i === 0, // First user is admin
                 credit: randomInt(10, 200),
             }).returning({ id: user.id }))
