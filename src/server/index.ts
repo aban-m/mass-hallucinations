@@ -45,6 +45,7 @@ export const appRouter = router({
     .mutation(async ({ input, ctx: { user } }) => {
       const result = fetchImage(null, input.prompt);
       await commitImage(user.id, input);
+      return fetchImage(null, input.prompt)
     }),
 
   generateImage: (serverPolicy.GUESTS_CAN_GENERATE

@@ -43,27 +43,24 @@ export async function getUserByUUID(uuid: string) {
 export async function commitImage(userId: string, dto: dtos.CommitImageDto) {
   const user = await getUserByUUID(userId);
   if (user.credit < serverPolicy.IMAGE_COST) {
-    throw new InsufficientCreditError()
+    throw new InsufficientCreditError();
   }
-  const out = await db.transaction(async (tx) => {
-    const result = await tx
-      .insert(creationTable)
-      .values({
-        ...dto,
-        userId,
-        id: randomUUID(),
-      })
-      .returning();
-    
-      const updatedRecords = await tx
-       .update(userTable)
-       .set({credit: user.credit - serverPolicy.IMAGE_COST})
-       .where(eq(userTable.id, userId))
-       .returning({ credit: userTable.credit })
-      
-      return updatedRecords[0].credit
-  });
+  //const out = await db.transaction(async (tx) => {
+  const result = await db
+    .insert(creationTable)
+    .values({
+      ...dto,
+      userId,
+      id: randomUUID(),
+    })
+    .returning();
 
-  return out
+  const updatedRecords = await db
+    .update(userTable)
+    .set({ credit: user.credit - serverPolicy.IMAGE_COST })
+    .where(eq(userTable.id, userId))
+    .returning({ credit: userTable.credit });
+
+  return updatedRecords[0].credit;
+  //});
 }
-
