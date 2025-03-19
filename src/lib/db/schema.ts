@@ -11,6 +11,8 @@ import {
 } from "drizzle-orm/pg-core";
 import { z } from "zod";
 
+import { creationRelations, userRelations, voteRelations } from "./relations";
+
 export const creationExtraArgs = z.object({
   width: z.number().int().positive().min(150).max(2000),
   height: z.number().int().positive().min(150).max(2000),
