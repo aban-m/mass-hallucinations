@@ -6,7 +6,7 @@ import {
   protectedProcedure,
   publicProcedure,
 } from "./trpc";
-import { creation as creationTable, user as userTable } from "@/lib/db/schema";
+import { Creation, creation as creationTable, User, user as userTable } from "@/lib/db/schema";
 import { serverPolicy } from "@/lib/common/config";
 import { eq, or, and } from "drizzle-orm";
 import { z } from "zod";
@@ -43,11 +43,14 @@ export const appRouter = router({
       return results;
     }),
 
-  resolveUser: publicProcedure
-    .input(z.string().email())
-    .query(async ({ input: email }) => {
-      const userRecord = await getUserByEmail(email);
-      return userRecord ? { uuid: userRecord.id } : { uuid: null };
+  user: publicProcedure
+    .input(z.string().uuid())
+    .query(async ({input: userUUID}) => {
+      const queryResult = await db.select().from(userTable)
+        .where(eq(userTable.id, userUUID)).limit(1)
+        .leftJoin(creationTable, eq(creationTable.userId, userTable.id))
+      const result = { user: queryResult[0].user as User, creations: (queryResult.map(d => d.creation)) as Creation[]} // TODO: Use the relational API
+      return result
     }),
 
   commitImage: protectedProcedure
