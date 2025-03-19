@@ -47,7 +47,7 @@ export const appRouter = router({
     .input(z.string().uuid())
     .query(async ({input: userUUID}) => {
       const queryResult = await db.select().from(userTable)
-        .where(eq(userTable.id, userUUID)).limit(1)
+        .where(eq(userTable.id, userUUID))
         .leftJoin(creationTable, eq(creationTable.userId, userTable.id))
       const result = { user: queryResult[0].user as User, creations: (queryResult.map(d => d.creation)) as Creation[]} // TODO: Use the relational API
       return result

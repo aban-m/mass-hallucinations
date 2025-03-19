@@ -19,6 +19,7 @@ export default function CreationView(props: CreationViewProps) {
           height={480}
         />
       </Link>
+      <Link href={`/studio?buildOn=${props.id}`}>Clone</Link>
       <pre>{props.id}</pre>
       <p>{props.title}</p>
       <i>Prompt: {props.prompt}</i>
