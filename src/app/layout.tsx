@@ -1,3 +1,4 @@
+import './globals.css'
 import type { Metadata } from "next";
 import { TRPCProvider } from "@/client";
 import SessionProvider from "@/client/session";
