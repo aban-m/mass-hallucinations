@@ -7,11 +7,11 @@ import { useParams } from "next/navigation";
 
 export default function ProfilePage() {
     const { userUUID } = useParams<{userUUID: string}>()
-    const {data: userProfile, isLoading, error }= trpc.user.useQuery(userUUID)
+    const {data: userProfile, isLoading, error }= trpc.userGallery.useQuery(userUUID)
 
     return (userProfile && (<>
-        <h1>{userProfile.user.name} - {userProfile.user.email}</h1>
-        <CreationGroup creations={userProfile!.creations} />
+        <h1>{userProfile.user.name}</h1>
+        <CreationGroup creations={userProfile!.creations.data} />
     </>))
     
 

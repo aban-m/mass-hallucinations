@@ -5,9 +5,9 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
 
 export default function StudioPage() {
-  const params = useSearchParams()
-  const buildOn = params.get('buildOn')
-  const pieceQuery = trpc.piece.useQuery(buildOn!, {enabled: false})
+  const params = useSearchParams();
+  const buildOn = params.get("buildOn");
+  const pieceQuery = trpc.piece.useQuery(buildOn!, { enabled: false });
   const [formData, setFormData] = useState({
     prompt: "",
     title: "",
@@ -17,12 +17,12 @@ export default function StudioPage() {
   });
 
   useEffect(() => {
-    if (!buildOn) return
+    if (!buildOn) return;
     (async () => {
-      const { data } = await pieceQuery.refetch()
-      if (data) setFormData(data!) 
-    })()
-  }, [buildOn])
+      const { data } = await pieceQuery.refetch();
+      if (data) setFormData(data!);
+    })();
+  }, [buildOn]);
 
   const [result, setResult] = useState<string>("");
   const commitImage = trpc.commitImage.useMutation({
@@ -32,9 +32,9 @@ export default function StudioPage() {
   });
   const generateImage = trpc.generateImage.useMutation({
     async onSuccess(data, variables, context) {
-      setResult(data)
+      setResult(data);
     },
-  })
+  });
 
   const handleSubmit = async (ev: React.FormEvent<HTMLFormElement>) => {
     ev.preventDefault();
@@ -48,11 +48,21 @@ export default function StudioPage() {
 
   const handlePreview = async () => {
     if (formData.prompt) {
-      generateImage.mutate({
-        ...formData
-      })
     }
-  }
+  };
+
+  const handleVariant = async () => {
+    if (formData.prompt) {
+      setFormData((prev) => ({
+        ...prev,
+        seed: Math.floor(Math.random() * 10000),
+      }));
+      generateImage.mutate({
+        ...formData,
+        extraArgs: { width: 512, height: 512 },
+      });
+    }
+  };
 
   return (
     <main style={{ padding: "1rem", fontFamily: "sans-serif" }}>
@@ -111,7 +121,10 @@ export default function StudioPage() {
           }
         />
 
-        <label htmlFor="isPublic" style={{ display: "flex", alignItems: "center" }}>
+        <label
+          htmlFor="isPublic"
+          style={{ display: "flex", alignItems: "center" }}
+        >
           <input
             id="isPublic"
             type="checkbox"
@@ -136,6 +149,7 @@ export default function StudioPage() {
         </button>
       </form>
       <button onClick={handlePreview}>Preview</button>
+      <button onClick={handleVariant}>See variant</button>
 
       {result && (
         <div style={{ textAlign: "center", marginTop: "1rem" }}>

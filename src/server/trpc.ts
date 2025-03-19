@@ -5,7 +5,7 @@ import { TransmittedUser } from "../../next-auth";
 import authOptions from "@/lib/auth/auth-options";
 
 interface ServerContext {
-    user: TransmittedUser
+    user: TransmittedUser | null
 }
 
 const t = initTRPC.context<ServerContext>().create()

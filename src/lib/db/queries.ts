@@ -6,7 +6,7 @@ import {
   userAccess as userAccessTable,
 } from "@/lib/db/schema";
 import { db } from ".";
-import { Column, eq, Table } from "drizzle-orm";
+import { Column, eq, Table, and, or, getTableColumns } from "drizzle-orm";
 import { serverPolicy } from "../common/config";
 import * as dtos from "@/lib/common/dtos";
 import { randomUUID } from "crypto";
@@ -30,18 +30,64 @@ export const getUserByUUID = async (uuid: string) =>
   getByUnique<User>(userTable, userTable.id, uuid);
 
 export const getCreationByUUID = async (uuid: string) =>
-   getByUnique<Creation>(creationTable, creationTable.id, uuid)
+  getByUnique<Creation>(creationTable, creationTable.id, uuid);
 
+const userWithCreations = () =>
+  db
+    .select({
+      user: {
+        id: userTable.id,
+        isAdmin: userTable.isAdmin,
+        name: userTable.name,
+        username: userTable.username,
+      },
+      creation: getTableColumns(creationTable),
+    })
+    .from(userTable)
+    .leftJoin(creationTable, eq(creationTable.userId, userTable.id));
 
-export async function canAccess(user: TransmittedUser | string | undefined, creation: Creation) {
-  const userId = (typeof user === "object") ? (user as TransmittedUser).id : user
+export async function getUserGallery(
+  user: TransmittedUser | string | null,
+  visitor: TransmittedUser | null
+): Promise<dtos.UserGalleryDto | null> {
+  const userId = typeof user === "object" ? (user as TransmittedUser).id : user;
+  const queryResult = await userWithCreations().where(
+    and(eq(userTable.id, userId))
+  );
+
+  const result = {
+    user: queryResult[0].user as User,
+    creations: queryResult.map((d) => d.creation) as Creation[],
+  };
+  return {
+    user: result.user,
+    creations: {
+      data: result.creations,
+      pagination: { count: result.creations.length },
+    },
+  };
+}
+
+export async function getPublicGallery(): Promise<dtos.GalleryDto> {
+  const queryResult = await userWithCreations().where(
+    eq(creationTable.isPublic, true)
+  );
+  const result = queryResult.map((d) => ({...d, creation: d.creation!}))
+  return { data: result, pagination: { count: queryResult.length } };
+}
+
+export async function canAccess(
+  user: TransmittedUser | string | null,
+  creation: Creation
+) {
+  const userId = typeof user === "object" ? (user as TransmittedUser).id : user;
 
   if (creation.isPublic || creation.userId === userId) {
     return true;
   }
 
-  if (!userId) return false
-  
+  if (!userId) return false;
+
   // query the table
 
   const hasAccess = !!(await db.query.userAccess.findFirst({
@@ -51,7 +97,6 @@ export async function canAccess(user: TransmittedUser | string | undefined, crea
 
   return hasAccess;
 }
-
 
 export async function commitImage(userId: string, dto: dtos.CommitImageDto) {
   const user = await getUserByUUID(userId);

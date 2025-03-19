@@ -1,27 +1,30 @@
 import { creation } from "@/lib/db/schema";
 import { db  } from "@/lib/db";
 import { eq } from "drizzle-orm";
+import { GenerateImageDto } from "../common/dtos";
 
-export async function fetchImage(creationId: string, prompt: string | null): Promise<string>;
-export async function fetchImage(creationId: string | null, prompt: string): Promise<string>;
+export async function fetchImage(creationId: string, data: null): Promise<string>;
+export async function fetchImage(creationId: null, data: GenerateImageDto): Promise<string>;
 
-export async function fetchImage(creationId: string | null, prompt: string | null) {
+export async function fetchImage(creationId: string | null, data: GenerateImageDto | null) {
     // first, retrieve the prompt
-    let actualPrompt = prompt;
-    if (!actualPrompt) {
+    let actualData = data
+    if (!actualData){
         // use sql-like drizzle to retrieve from id
         const creationRecord = (await db.select().from(creation).where(eq(creation.id, creationId!)).limit(1))[0]
         if (!creationRecord) {
             throw new Error("Creation not found")
         }
-        actualPrompt = creationRecord.prompt
+        actualData = creationRecord
     }
-    return (async () =>  buildImageUrl(actualPrompt))()
+    return (async () =>  buildImageUrl(actualData))()
     
 }
 
 
-function buildImageUrl(creationId: string): string {
-    return `https://image.pollinations.ai/prompt/${creationId}`
+function buildImageUrl(actualData: GenerateImageDto): string {
+    const url = `https://image.pollinations.ai/prompt/${actualData.prompt}?seed=${actualData.seed}`
+    console.log(url)
+    return url
 }
 
