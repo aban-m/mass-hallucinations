@@ -33,14 +33,20 @@ export const getCreationByUUID = async (uuid: string) =>
    getByUnique<Creation>(creationTable, creationTable.id, uuid)
 
 
-export async function canAccess(user: TransmittedUser, creation: Creation) {
-  if (creation.isPublic || user.isAdmin || creation.userId === user.id) {
+export async function canAccess(user: TransmittedUser | string | undefined, creation: Creation) {
+  const userId = (typeof user === "object") ? (user as TransmittedUser).id : user
+
+  if (creation.isPublic || creation.userId === userId) {
     return true;
   }
+
+  if (!userId) return false
+  
   // query the table
+
   const hasAccess = !!(await db.query.userAccess.findFirst({
     where: (ua, { eq, and }) =>
-      and(eq(ua.userId, user.id), eq(ua.creationId, creation.id)),
+      and(eq(ua.userId, userId), eq(ua.creationId, creation.id)),
   }));
 
   return hasAccess;
