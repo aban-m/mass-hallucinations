@@ -1,9 +1,13 @@
 "use client";
 
 import { trpc } from "@/client/trpc";
-import { useState } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
+import { useEffect, useState } from "react";
 
 export default function StudioPage() {
+  const params = useSearchParams()
+  const buildOn = params.get('buildOn')
+  const pieceQuery = trpc.piece.useQuery(buildOn!, {enabled: false})
   const [formData, setFormData] = useState({
     prompt: "",
     title: "",
@@ -11,6 +15,15 @@ export default function StudioPage() {
     seed: 1,
     isPublic: false,
   });
+
+  useEffect(() => {
+    if (!buildOn) return
+    (async () => {
+      const { data } = await pieceQuery.refetch()
+      if (data) setFormData(data!) 
+    })()
+  }, [buildOn])
+
   const [result, setResult] = useState<string>("");
   const commitImage = trpc.commitImage.useMutation({
     async onSuccess(data, variables, context) {
