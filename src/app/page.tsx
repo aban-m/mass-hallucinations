@@ -1,9 +1,5 @@
+import { redirect } from "next/navigation";
 
 export default function Home() {
-
-  return (
-    <>
-      <h1>Homepage.</h1>
-    </>
-  );
+  return redirect("/gallery")  
 }
