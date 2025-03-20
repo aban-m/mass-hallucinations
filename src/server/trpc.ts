@@ -36,7 +36,7 @@ export const protectedProcedure = authedProcedure.use(async (opts) => {
 // Requires admin privileges.
 export const adminProcedure = protectedProcedure.use(async (opts) => {
     const { ctx } = opts
-    if (!ctx.user.isAdmin) {
+    if (!ctx.user?.isAdmin) {
         throw new TRPCError({code: "FORBIDDEN", message: 'Forbidden'})
     }
     return opts.next()

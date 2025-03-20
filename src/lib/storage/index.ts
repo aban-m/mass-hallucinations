@@ -22,9 +22,10 @@ export async function fetchImage(creationId: string | null, data: GenerateImageD
 }
 
 
-function buildImageUrl(actualData: GenerateImageDto): string {
+async function buildImageUrl(actualData: GenerateImageDto): Promise<string> {
     const url = `https://image.pollinations.ai/prompt/${actualData.prompt}?seed=${actualData.seed}`
     console.log(url)
+    await setTimeout(() => {}, 2000)        // TODO: Implement this. Must wait until the data is actually generated.
     return url
 }
 
