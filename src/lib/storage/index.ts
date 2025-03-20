@@ -3,13 +3,15 @@ import { db  } from "@/lib/db";
 import { eq } from "drizzle-orm";
 import { GenerateImageDto } from "../common/dtos";
 
-export async function fetchImage(creationId: string, data: null): Promise<string>;
-export async function fetchImage(creationId: null, data: GenerateImageDto): Promise<string>;
-
-export async function fetchImage(creationId: string | null, data: GenerateImageDto | null) {
+export async function fetchImage({creationId, data, commit}:{ 
+    creationId?: string, 
+    data?: GenerateImageDto, 
+    commit?: boolean 
+}): Promise<string> {
+    console.log(creationId)
     // first, retrieve the prompt
     let actualData = data
-    if (!actualData){
+    if (creationId){
         // use sql-like drizzle to retrieve from id
         const creationRecord = (await db.select().from(creation).where(eq(creation.id, creationId!)).limit(1))[0]
         if (!creationRecord) {
@@ -17,7 +19,7 @@ export async function fetchImage(creationId: string | null, data: GenerateImageD
         }
         actualData = creationRecord
     }
-    return (async () =>  buildImageUrl(actualData))()
+    return (async () =>  buildImageUrl(actualData!))()
     
 }
 
@@ -25,7 +27,7 @@ export async function fetchImage(creationId: string | null, data: GenerateImageD
 async function buildImageUrl(actualData: GenerateImageDto): Promise<string> {
     const url = `https://image.pollinations.ai/prompt/${actualData.prompt}?seed=${actualData.seed}`
     console.log(url)
-    await setTimeout(() => {}, 2000)        // TODO: Implement this. Must wait until the data is actually generated.
+    await new Promise((resolve) => setTimeout(resolve, 2000))       // TODO: Implement this. Must wait until the data is actually generated.
     return url
 }
 

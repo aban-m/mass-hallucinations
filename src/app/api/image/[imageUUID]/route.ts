@@ -31,7 +31,7 @@ export async function GET(
     }
 
     try {
-        const url = await fetchImage(imageUUID!, null)
+        const url = await fetchImage({creationId: imageUUID!})
         if (!url) {
             return NextResponse.json({ error: "Not Found" }, { status: 404 });
         }
