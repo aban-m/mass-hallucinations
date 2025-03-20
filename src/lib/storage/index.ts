@@ -3,7 +3,7 @@ import { db  } from "@/lib/db";
 import { eq } from "drizzle-orm";
 import { GenerateImageDto } from "../common/dtos";
 
-export async function fetchImage({creationId, data, commit}:{ 
+export async function fetchImage({creationId, data}:{ 
     creationId?: string, 
     data?: GenerateImageDto, 
     commit?: boolean 

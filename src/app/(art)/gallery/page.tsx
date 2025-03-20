@@ -4,7 +4,7 @@ import CreationGroup from "@/components/CreationGroup";
 import { GetGalleryDto } from "@/lib/common/dtos";
 import { useState } from "react";
 export default function GalleryPage() {
-  const [params, setParams] = useState<GetGalleryDto>({which: "PUBLIC"})
+  const [params] = useState<GetGalleryDto>({which: "PUBLIC"})
 
   const {data: gallery} = trpc.gallery.useQuery(params)
 

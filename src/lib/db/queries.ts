@@ -15,7 +15,7 @@ import { TransmittedUser } from "../../../next-auth";
 async function getByUnique<T>(
   table: Table,
   col: Column,
-  val: any
+  val: unknown
 ): Promise<T | undefined> {
   const record = (
     (await db.select().from(table).where(eq(col, val)).limit(1)) as T[]
@@ -47,6 +47,7 @@ const userWithCreations = () =>
 
 export async function getUserGallery(
   user: TransmittedUser | string | null,
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   visitor: TransmittedUser | null
 ): Promise<dtos.UserGalleryDto | null> {
   const userId = typeof user === "object" ? (user as TransmittedUser).id : user;
@@ -104,7 +105,7 @@ export async function commitImage(userId: string, dto: dtos.CommitImageDto) {
     throw new InsufficientCreditError();
   }
   //const out = await db.transaction(async (tx) => {
-  const result = await db
+  await db
     .insert(creationTable)
     .values({
       ...dto,

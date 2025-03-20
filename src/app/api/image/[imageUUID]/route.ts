@@ -1,14 +1,14 @@
+"use client";
 import { canAccess, getCreationByUUID } from "@/lib/db/queries";
 import { fetchImage } from "@/lib/storage";
 import { getServerSession } from "next-auth";
+import { useParams } from "next/navigation";
 import { NextResponse } from "next/server";
 import { z } from "zod";
 
 export async function GET(
-    request: Request,
-    { params }: { params: { imageUUID?: string } }
 ) {
-
+    const params = useParams<{imageUUID: string}>()
     const { imageUUID } = await params;
 
     if (!z.string().uuid().safeParse(imageUUID)) {
@@ -37,8 +37,8 @@ export async function GET(
         }
         return NextResponse.redirect(url);
 
-    } catch (error) {
-
+    // } catch (error) {
+    } catch {
         return NextResponse.json({ error: "Not Found" }, { status: 404 });
     }
 }

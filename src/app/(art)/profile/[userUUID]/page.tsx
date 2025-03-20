@@ -6,7 +6,7 @@ import { useParams } from "next/navigation";
 
 export default function ProfilePage() {
     const { userUUID } = useParams<{userUUID: string}>()
-    const {data: userProfile, isLoading, error }= trpc.userGallery.useQuery(userUUID)
+    const {data: userProfile }= trpc.userGallery.useQuery(userUUID)
 
     return (userProfile && (<>
         <h1>{userProfile.user.name}</h1>

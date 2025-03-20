@@ -18,7 +18,7 @@ const authOptions: NextAuthOptions = {
       console.log("\t\tSIGNIN CALLBACK");
       return true;
     },
-    async jwt({ token, user }) {
+    async jwt({ token }) {
       console.log("\t\tJWT CALLBACK");
       return token;
     },
