@@ -1,23 +1,22 @@
-"use client";
 import { canAccess, getCreationByUUID } from "@/lib/db/queries";
 import { fetchImage } from "@/lib/storage";
 import { getServerSession } from "next-auth";
-import { useParams } from "next/navigation";
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 
 export async function GET(
+    request: NextRequest
 ) {
-    const params = useParams<{imageUUID: string}>()
-    const { imageUUID } = await params;
-
-    if (!z.string().uuid().safeParse(imageUUID)) {
-        return NextResponse.json(null, { status: 400 });
+    const params = request.nextUrl.searchParams
+    const id = params.get("id")
+    console.log(id)
+    if (!z.string().uuid().safeParse(id)) {
+        return NextResponse.json({'error': 'Invalid UUID'}, { status: 400 });
     }
 
-    const creation = await getCreationByUUID(imageUUID!)
+    const creation = await getCreationByUUID(id!)
     if (!creation) { 
-        return NextResponse.json(null, {status: 400})
+        return NextResponse.json({'error': 'Could not find creation'}, {status: 404})
     }
 
     const accessible = creation!.isPublic
@@ -31,7 +30,7 @@ export async function GET(
     }
 
     try {
-        const url = await fetchImage({creationId: imageUUID!})
+        const url = await fetchImage({creationId: id!})
         if (!url) {
             return NextResponse.json({ error: "Not Found" }, { status: 404 });
         }

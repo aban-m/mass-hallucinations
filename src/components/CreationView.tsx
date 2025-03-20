@@ -13,7 +13,7 @@ export default function CreationView({ id, title, prompt }: CreationViewProps) {
   return (
     <Card className="relative overflow-hidden rounded-2xl shadow-md p-3 flex flex-col items-center">
       <img
-        src={`/api/image/${id}`}
+        src={`/api/image?id=${id}`}
         alt={title}
         width={360}
         height={480}
