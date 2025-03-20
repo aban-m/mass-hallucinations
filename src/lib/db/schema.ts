@@ -4,14 +4,21 @@ import {
   integer,
   jsonb,
   pgTable,
+  PgUpdateDynamic,
   timestamp,
   unique,
+  UpdateDeleteAction,
   uuid,
   varchar,
 } from "drizzle-orm/pg-core";
 import { z } from "zod";
 
 import { creationRelations, userRelations, voteRelations } from "./relations";
+
+const alwaysCascade = {
+  onDelete: "cascade" as UpdateDeleteAction,
+  onUpdate: "cascade" as UpdateDeleteAction,
+};
 
 export const creationExtraArgs = z.object({
   width: z.number().int().positive().min(150).max(2000),
@@ -42,7 +49,7 @@ export const creation = pgTable(
     id: uuid("id").primaryKey(),
     userId: uuid("user_id")
       .notNull()
-      .references(() => user.id),
+      .references(() => user.id, alwaysCascade),
     isPublic: boolean("is_public").notNull().default(false),
     title: varchar("title", { length: 120 }).notNull(),
     description: varchar("description", { length: 500 }).notNull(),
@@ -65,7 +72,7 @@ export const vote = pgTable(
     id: uuid("id").primaryKey(),
     creationId: uuid("creation_id")
       .notNull()
-      .references(() => creation.id),
+      .references(() => creation.id, alwaysCascade),
     userId: uuid("user_id")
       .notNull()
       .references(() => user.id),
@@ -84,10 +91,10 @@ export const userAccess = pgTable(
     id: uuid("id").primaryKey(),
     userId: uuid("user_id")
       .notNull()
-      .references(() => user.id),
+      .references(() => user.id, alwaysCascade),
     creationId: uuid("creation_id")
       .notNull()
-      .references(() => creation.id),
+      .references(() => creation.id, alwaysCascade),
   },
   (table) => [
     index("user_access_user_idx").on(table.userId),
@@ -99,6 +106,6 @@ export const userAccess = pgTable(
   ]
 );
 
-export type User = typeof user.$inferSelect
-export type Creation = typeof creation.$inferSelect
-export type Vote = typeof vote.$inferSelect
+export type User = typeof user.$inferSelect;
+export type Creation = typeof creation.$inferSelect;
+export type Vote = typeof vote.$inferSelect;
