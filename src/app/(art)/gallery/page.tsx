@@ -14,7 +14,7 @@ export default function GalleryPage() {
 
   return (
     <div className="w-full">
-        <CreationGroup creations={gallery.data!.map((d) => d.creation)} />
+        <CreationGroup creations={gallery.data.map((d) => d.creation)} />
       </div>
   );
 }
