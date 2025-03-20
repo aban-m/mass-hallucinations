@@ -1,7 +1,7 @@
 "use client";
 
 import { trpc } from "@/client/trpc";
-import { useSearchParams } from "next/navigation";
+import { redirect, useRouter, useSearchParams } from "next/navigation";
 import { Form } from "^/form";
 import { Button } from "^/button";
 import { Label } from "^/label";
@@ -14,6 +14,7 @@ import { ImageWithLoader } from "@/components/ui/image";
 
 export default function StudioPage() {
   const params = useSearchParams();
+  const router = useRouter();
   const buildOn = params.get("buildOn");
   const pieceQuery = trpc.piece.useQuery(buildOn!, { enabled: false });
   const [formLoading, setFormLoading] = useState<boolean>(false);
@@ -22,52 +23,55 @@ export default function StudioPage() {
     title: "",
     description: "",
     seed: 1,
-    isPublic: false
+    isPublic: false,
   });
 
   useEffect(() => {
     if (!buildOn) return;
     (async () => {
-      setFormLoading(true)
+      setFormLoading(true);
       const { data } = await pieceQuery.refetch();
       if (data) setFormData(data!);
       setFormLoading(false);
     })();
   }, [buildOn]);
 
-  const commitImage = trpc.commitImage.useMutation()
-  const generateImage = trpc.generateImage.useMutation()
+  const commitImage = trpc.commitImage.useMutation({
+    async onSuccess() { 
+      router.push('/gallery')
+    }
+  });
+  const generateImage = trpc.generateImage.useMutation();
 
   const handleSubmit = async (ev: React.FormEvent<HTMLFormElement>) => {
     ev.preventDefault();
-    if (formData.prompt) {
-      commitImage.mutate({
-        ...formData,
-        extraArgs: { width: 512, height: 512 },
+    if (!formData.prompt) return;
+    commitImage.mutate({
+      ...formData,
+      extraArgs: { width: 512, height: 512 },
       });
-    }
   };
 
   const handlePreview = async () => {
-    if (formData.prompt) {
-      generateImage.mutate({
-        ...formData,
-        extraArgs: { width: 512, height: 512 },
-      });
-    }
+    if (!formData.prompt) return;
+    generateImage.mutate({
+      ...formData,
+      extraArgs: { width: 512, height: 512 },
+    });
   };
 
   const handleVariant = async () => {
-    if (formData.prompt) {
-      setFormData((prev) => ({
-        ...prev,
-        seed: Math.floor(Math.random() * 10000),
-      }));
-      generateImage.mutate({
-        ...formData,
-        extraArgs: { width: 512, height: 512 },
-      });
-    }
+    if (!formData.prompt) return;
+    const newSeed = Math.floor(Math.random() * 10000);
+    setFormData((prev) => ({
+      ...prev,
+      seed: newSeed,
+    }));
+    generateImage.mutate({
+      ...formData,
+      seed: newSeed,
+      extraArgs: { width: 512, height: 512 },
+    });
   };
   return (
     <div className="flex flex-col items-center justify-center p-6">
@@ -77,7 +81,11 @@ export default function StudioPage() {
             <CardTitle className="text-center">Studio</CardTitle>
           </CardHeader>
           <CardContent>
-            <form onSubmit={handleSubmit} className="space-y-4" aria-disabled={!formLoading}>
+            <form
+              onSubmit={handleSubmit}
+              className="space-y-4"
+              aria-disabled={!formLoading}
+            >
               <div className="space-y-2">
                 <Label htmlFor="title">Title</Label>
                 <Input
@@ -151,7 +159,10 @@ export default function StudioPage() {
             </form>
           </CardContent>
         </Card>
-        <ImageWithLoader src={generateImage.data} loading={generateImage.isLoading} />
+        <ImageWithLoader
+          src={generateImage.data}
+          loading={generateImage.isLoading}
+        />
       </div>
     </div>
   );

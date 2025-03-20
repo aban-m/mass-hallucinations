@@ -101,6 +101,7 @@ export async function canAccess(
 export async function commitImage(userId: string, dto: dtos.CommitImageDto) {
   const user = await getUserByUUID(userId);
   if (user!.credit < serverPolicy.IMAGE_COST) {
+    console.log('no credit')
     throw new InsufficientCreditError();
   }
   //const out = await db.transaction(async (tx) => {

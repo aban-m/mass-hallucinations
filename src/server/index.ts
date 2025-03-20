@@ -64,9 +64,9 @@ export const appRouter = router({
   commitImage: protectedProcedure
     .input(dtos.commitImageDto)
     .mutation(async ({ input: data, ctx: { user } }) => {
-      const result = fetchImage({data});
+      const result = await fetchImage({data});
       await commitImage(user!.id, data);
-      return fetchImage({data});
+      return result
     }),
 
   generateImage: (serverPolicy.GUESTS_CAN_GENERATE
