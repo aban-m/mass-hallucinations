@@ -4,13 +4,12 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { Loader2 } from "lucide-react";
 
 type ImageWithLoaderProps = {
-  src: string;
+  src: string | undefined;
   className?: string;
   loading: boolean;
   imgProps?: React.ImgHTMLAttributes<HTMLImageElement>;
   divProps?: React.HTMLAttributes<HTMLDivElement>;
 };
-
 export function ImageWithLoader({
   src,
   className,
@@ -22,22 +21,24 @@ export function ImageWithLoader({
     <div
       {...divProps}
       className={cn(
-        "relative flex items-center justify-center",
+        "relative flex items-center justify-center w-full",
         divProps?.className
       )}
     >
-      {loading && (
-        <Skeleton
-          className={cn("absolute w-full h-full rounded-md", className)}
-        />
-      )}
-      {loading && <Loader2 className="absolute animate-spin text-gray-500" />}
+      {loading ? (
+        <>
+          {/* Skeleton should preserve aspect ratio */}
+          <Skeleton
+            className={cn("absolute w-full h-full rounded-md", className)}
+          />
+          <Loader2 className="absolute animate-spin text-gray-500" />
+        </>
+      ) : null}
       <img
         {...imgProps}
         src={src}
         className={cn(
-          "",
-          loading ? "opacity-0" : "opacity-100",
+          "object-cover", // Ensure the image covers the space correctly
           imgProps?.className
         )}
       />

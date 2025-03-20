@@ -16,33 +16,27 @@ export default function StudioPage() {
   const params = useSearchParams();
   const buildOn = params.get("buildOn");
   const pieceQuery = trpc.piece.useQuery(buildOn!, { enabled: false });
+  const [formLoading, setFormLoading] = useState<boolean>(false);
   const [formData, setFormData] = useState({
     prompt: "",
     title: "",
     description: "",
     seed: 1,
-    isPublic: false,
+    isPublic: false
   });
 
   useEffect(() => {
     if (!buildOn) return;
     (async () => {
+      setFormLoading(true)
       const { data } = await pieceQuery.refetch();
       if (data) setFormData(data!);
+      setFormLoading(false);
     })();
   }, [buildOn]);
 
-  const [result, setResult] = useState<string>("");
-  const commitImage = trpc.commitImage.useMutation({
-    async onSuccess(data, variables, context) {
-      setResult(data);
-    },
-  });
-  const generateImage = trpc.generateImage.useMutation({
-    async onSuccess(data, variables, context) {
-      setResult(data);
-    },
-  });
+  const commitImage = trpc.commitImage.useMutation()
+  const generateImage = trpc.generateImage.useMutation()
 
   const handleSubmit = async (ev: React.FormEvent<HTMLFormElement>) => {
     ev.preventDefault();
@@ -83,7 +77,7 @@ export default function StudioPage() {
             <CardTitle className="text-center">Studio</CardTitle>
           </CardHeader>
           <CardContent>
-            <form onSubmit={handleSubmit} className="space-y-4">
+            <form onSubmit={handleSubmit} className="space-y-4" aria-disabled={!formLoading}>
               <div className="space-y-2">
                 <Label htmlFor="title">Title</Label>
                 <Input
@@ -157,7 +151,7 @@ export default function StudioPage() {
             </form>
           </CardContent>
         </Card>
-        {result && <ImageWithLoader src={result} loading={generateImage.isLoading} />}
+        <ImageWithLoader src={generateImage.data} loading={generateImage.isLoading} />
       </div>
     </div>
   );
