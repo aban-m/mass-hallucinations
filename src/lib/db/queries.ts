@@ -6,7 +6,7 @@ import {
   userAccess as userAccessTable,
 } from "@/lib/db/schema";
 import { db } from ".";
-import { Column, eq, Table, and, or, getTableColumns } from "drizzle-orm";
+import { Column, eq, Table, and, desc, getTableColumns } from "drizzle-orm";
 import { serverPolicy } from "../common/config";
 import * as dtos from "@/lib/common/dtos";
 import { randomUUID } from "crypto";
@@ -71,7 +71,7 @@ export async function getUserGallery(
 export async function getPublicGallery(): Promise<dtos.GalleryDto> {
   const queryResult = await userWithCreations().where(
     eq(creationTable.isPublic, true)
-  );
+  ).orderBy(desc(creationTable.createdAt));
   const result = queryResult.map((d) => ({...d, creation: d.creation!}))
   return { data: result, pagination: { count: queryResult.length } };
 }
