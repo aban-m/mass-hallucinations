@@ -1,10 +1,6 @@
 "use client";
 import { trpc } from "@/client/trpc";
-import { user } from "@/lib/db/schema";
-import { getServerSession } from "next-auth";
 import { useSession } from "next-auth/react";
-import Link from "next/link";
-import { useEffect } from "react";
 
 export default function UsersListPage() {
   const session = useSession()

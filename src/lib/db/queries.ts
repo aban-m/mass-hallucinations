@@ -3,7 +3,6 @@ import {
   Creation,
   user as userTable,
   creation as creationTable,
-  userAccess as userAccessTable,
 } from "@/lib/db/schema";
 import { db } from ".";
 import { Column, eq, Table, and, desc, getTableColumns } from "drizzle-orm";

@@ -2,7 +2,6 @@
 
 import { trpc } from "@/client/trpc";
 import CreationGroup from "@/components/CreationGroup";
-import { Creation } from "@/lib/db/schema";
 import { useParams } from "next/navigation";
 
 export default function ProfilePage() {

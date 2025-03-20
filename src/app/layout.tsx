@@ -7,7 +7,6 @@ import { getServerSession, Session } from "next-auth";
 import authOptions from "@/lib/auth/auth-options";
 import { DynamicNavigation } from "@/components/navigation";
 import { Button } from "@/components/ui/button";
-import { Separator } from "@/components/ui/separator";
 
 export const metadata: Metadata = {
   title: "Mass Hallucinations",

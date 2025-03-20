@@ -7,17 +7,11 @@ import {
   publicProcedure,
 } from "./trpc";
 import {
-  Creation,
-  creation as creationTable,
-  User,
-  userAccess,
   user as userTable,
 } from "@/lib/db/schema";
 import { serverPolicy } from "@/lib/common/config";
-import { eq, or, and } from "drizzle-orm";
 import { z } from "zod";
 import { fetchImage } from "@/lib/storage";
-import { randomUUID } from "crypto";
 import {
   canAccess,
   commitImage,
@@ -45,28 +39,31 @@ export const appRouter = router({
 
   gallery: authedProcedure
     .input(dtos.getGalleryDto)
-    .query(async ({ input : {which}, ctx: { user } }): Promise<dtos.GalleryDto> => {
-      if (!user && which === 'MINE') {
-        throw new TRPCError({code: "UNAUTHORIZED"})
+    .query(
+      async ({ input: { which }, ctx: { user } }): Promise<dtos.GalleryDto> => {
+        if (!user && which === "MINE") {
+          throw new TRPCError({ code: "UNAUTHORIZED" });
+        }
+        if (which === "MINE")
+          throw new TRPCError({ code: "INTERNAL_SERVER_ERROR" }); // TODO: Implement this
+        const result = await getPublicGallery();
+        return result;
       }
-      if (which === 'MINE') throw new TRPCError({code: "INTERNAL_SERVER_ERROR"}) // TODO: Implement this
-      const result = await getPublicGallery()
-      return result
-    }),
+    ),
 
   userGallery: publicProcedure
     .input(z.string().uuid())
-    .query(async ({ input: userUUID, ctx : {user: visitor} }) => {
-      const result = await getUserGallery(userUUID, visitor)
-      return result
+    .query(async ({ input: userUUID, ctx: { user: visitor } }) => {
+      const result = await getUserGallery(userUUID, visitor);
+      return result;
     }),
 
   commitImage: protectedProcedure
     .input(dtos.commitImageDto)
     .mutation(async ({ input: data, ctx: { user } }) => {
-      const result = await fetchImage({data});
+      const result = await fetchImage({ data });
       await commitImage(user!.id, data);
-      return result
+      return result;
     }),
 
   generateImage: (serverPolicy.GUESTS_CAN_GENERATE
@@ -75,7 +72,7 @@ export const appRouter = router({
   )
     .input(dtos.generateImageDto)
     .mutation(async ({ input: data }) => {
-      return fetchImage({data});
+      return fetchImage({ data });
     }),
 
   listUsers: adminProcedure.query(async () => {

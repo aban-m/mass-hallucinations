@@ -1,4 +1,4 @@
-import Image, { ImageProps } from "next/image";
+import { ImageProps } from "next/image";
 import { creation } from "@/lib/db/schema";
 import Link from "next/link";
 import { Card, CardContent } from "^/card";

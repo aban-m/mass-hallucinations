@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { creation as creationTable, User, user as userTable } from '@/lib/db/schema'
+import { creation as creationTable, user as userTable } from '@/lib/db/schema'
 import { createInsertSchema, createSelectSchema } from "drizzle-zod";
 
 // #region "Pagination"

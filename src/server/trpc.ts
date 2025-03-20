@@ -1,6 +1,6 @@
 
 import { initTRPC, TRPCError } from "@trpc/server";
-import { getServerSession, Session } from "next-auth"
+import { getServerSession } from "next-auth"
 import { TransmittedUser } from "../../next-auth";
 import authOptions from "@/lib/auth/auth-options";
 

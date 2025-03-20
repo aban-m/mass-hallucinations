@@ -4,7 +4,6 @@ import {
   integer,
   jsonb,
   pgTable,
-  PgUpdateDynamic,
   timestamp,
   unique,
   UpdateDeleteAction,
@@ -13,7 +12,6 @@ import {
 } from "drizzle-orm/pg-core";
 import { z } from "zod";
 
-import { creationRelations, userRelations, voteRelations } from "./relations";
 
 const alwaysCascade = {
   onDelete: "cascade" as UpdateDeleteAction,

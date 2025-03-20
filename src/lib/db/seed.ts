@@ -1,7 +1,6 @@
 import { db } from "./index";
 import { randomUUID } from "crypto";
 import { creation, user, userAccess } from "./schema"; // Import userAccess table
-import { eq } from "drizzle-orm";
 
 // Generate random boolean
 const randomBool = () => Math.random() > 0.5;
